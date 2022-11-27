@@ -32,8 +32,8 @@ The bot infrastructure code (lambda, dynamodb, etc) is developed as a normal AWS
 There's no CI/CD pipeline yet. So releasing and deployment is a bit manual... basically a 
 2-step process:
 
-1) Generate a Lambda ZIP file from the [app-javaubble](./app-javabubble) directory
-2) Deploy it with CDK from the [iac-javaubble](./app-javabubble) directory
+1) Generate a Lambda ZIP file from the [app-javabubble](./app-javabubble) directory
+2) Deploy it with CDK from the [iac-javabubble](./app-javabubble) directory
 
 * or more; there is a limit on the number of characters allowed in a toot.. so a long list of 
 new accounts may be split up into multiple distinct toots.
