@@ -13,11 +13,13 @@ AWS_ACCESS_KEY_ID=id AWS_SECRET_ACCESS_KEY=key AWS_REGION=local aws dynamodb cre
              --provisioned-throughput \
                  ReadCapacityUnits=5,WriteCapacityUnits=5 \
              --table-class STANDARD \
-             --endpoint-url http://localhost:8000
+             --endpoint-url http://localhost:8000 \
+             | cat
 
 AWS_ACCESS_KEY_ID=id AWS_SECRET_ACCESS_KEY=key AWS_REGION=local aws dynamodb update-table \
     --table-name JavaBubbleAccounts \
     --attribute-definitions AttributeName=LastAnnouncedEpoch,AttributeType=S \
     --global-secondary-index-updates \
         "[{\"Create\":{\"IndexName\": \"LastAnnouncedEpoch-index\",\"KeySchema\":[{\"AttributeName\":\"LastAnnouncedEpoch\",\"KeyType\":\"HASH\"}], \
-        \"ProvisionedThroughput\": {\"ReadCapacityUnits\": 5, \"WriteCapacityUnits\": 5 },\"Projection\":{\"ProjectionType\":\"ALL\"}}}]"
+        \"ProvisionedThroughput\": {\"ReadCapacityUnits\": 5, \"WriteCapacityUnits\": 5 },\"Projection\":{\"ProjectionType\":\"ALL\"}}}]" \
+        | cat
