@@ -3,3 +3,4 @@ build/
 node_modules/
 app/
 *.zip
+package-lock.json
