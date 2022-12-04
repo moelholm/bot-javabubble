@@ -15,7 +15,7 @@ function createTootMessageText(fediverseAccounts: AccountEntity[]) {
   return (
     `Awesome #java / #jvm savvy accounts to follow:` +
     `\n${accountsString}` +
-    `\n\nRemove trailing underscores (ensures that the accounts doesn't get notified by this toot)` +
+    `\n\nRemove trailing underscores (ensures that the accounts doesn't get notified by this toot).` +
     ` More updates like this? Follow me or #JavaBubbleOrgAccountsRefresher` +
     `\n\nSource: #javabubble (javabubble.org)` +
     `\nBotdev: ${process.env.MASTODON_BOT_OWNER}`
