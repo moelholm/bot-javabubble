@@ -5,7 +5,7 @@ export type Toot = {
   status: string;
 };
 
-export async function toot(toot: Toot) {
+export async function sendToot(toot: Toot) {
   if (process.env.MASTODON_SEND_MODE?.toLowerCase() !== "enabled") {
     console.log(
       `Mastodon send mode is disabled. Ignoring sending toot: ${JSON.stringify(

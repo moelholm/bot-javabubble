@@ -36,3 +36,10 @@ This results in a zip file - which can then be deployed with CDK using the IaC ð
 ## Reference
 - [mastodon api doc](https://docs.joinmastodon.org/methods/statuses/)
 - [dynamodb-admin](https://github.com/aaronshaf/dynamodb-admin)
+
+## Todo
+
+- Organize modules
+- Remove redundancy from the two announce-XYZ-accounts-service.ts files as they are 95% similar
+- Repurpose account-service
+- Make local launch less clunky
