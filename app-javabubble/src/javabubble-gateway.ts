@@ -1,7 +1,7 @@
 import axios from "axios";
 
 function accountInputHasSafeName(account: AccountInput): boolean {
-  const nameRegEx = /^[\p{Letter}\s\-\d\.']+$/u;
+  const nameRegEx = /^[\p{Letter}\s\-\d\.\(\)']+$/u;
   return !!(account.name || "").match(nameRegEx);
 }
 

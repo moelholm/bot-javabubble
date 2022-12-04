@@ -36,3 +36,9 @@ This results in a zip file - which can then be deployed with CDK using the IaC ð
 ## Reference
 - [mastodon api doc](https://docs.joinmastodon.org/methods/statuses/)
 - [dynamodb-admin](https://github.com/aaronshaf/dynamodb-admin)
+
+## Todo
+
+- Organize modules
+- Repurpose account-service
+- Make local launch less clunky

@@ -6,12 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "npx tsc",
-    "start:dev": "nodemon",
+    "start:dev:announce-new-accounts": "nodemon announce-new-accounts",
+    "start:dev:announce-old-accounts": "nodemon announce-old-accounts",
     "build": "rimraf ./build && tsc",
     "zip": "zip -r lambda-function.zip build node_modules",
     "build:lambda": "npm install && npm run build && rimraf ./node_modules && npm i --production && npm run zip && npm install",
     "tool:dynamodb-local": "docker run -p 8000:8000 amazon/dynamodb-local -jar DynamoDBLocal.jar -inMemory -sharedDb",
-    "tool:dynamodb-init": "script/localdev-ddb-table-create.sh",
+    "tool:dynamodb-init": "ts-node src/npm-run-script/create-ddb-table.ts",
     "tool:dynamodb-admin": "DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin"
   },
   "author": "",
@@ -28,7 +29,7 @@
     "@aws-sdk/client-dynamodb": "^3.209.0",
     "@aws-sdk/client-ssm": "^3.216.0",
     "@aws-sdk/lib-dynamodb": "^3.209.0",
-    "axios": "^1.1.3",
+    "axios": "1.1.3",
     "dotenv": "^16.0.3"
   }
 }

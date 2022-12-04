@@ -1,5 +1,7 @@
-import {wakeUp} from './bot';
+import {announceNewAccounts} from './announce-new-accounts-service';
+import {announceOldAccounts} from './announce-old-accounts-service';
 
 module.exports = {
-  handler : wakeUp
+  announceNewAccounts : announceNewAccounts,
+  announceOldAccounts : announceOldAccounts
 }
