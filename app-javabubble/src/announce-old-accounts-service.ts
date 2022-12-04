@@ -8,15 +8,13 @@ import { getParameters } from "./ssm-gateway";
 import { generateBatches } from "./account-service";
 
 function createTootMessageText(fediverseAccounts: AccountEntity[]) {
-  // NOTE: Trailing underscores are intentional: ensures that the accounts don't get notified
   const accountsString = fediverseAccounts
-    .map((a) => `\n👋🏼 ${a.name} - ${a.fediverse}__`)
+    .map((a) => `\n👋🏼 ${a.name} - ${a.fediverse}`)
     .join("");
   return (
     `Awesome #java / #jvm savvy accounts to follow:` +
     `\n${accountsString}` +
-    `\n\nRemove trailing underscores (ensures that the accounts doesn't get notified by this toot).` +
-    ` More updates like this? Follow me or #JavaBubbleOrgAccountsRefresher` +
+    `\n\nMore updates like this? Follow me or #JavaBubbleOrgAccountsRefresher` +
     `\n\nSource: #javabubble (javabubble.org)` +
     `\nBotdev: ${process.env.MASTODON_BOT_OWNER}`
   );
@@ -29,7 +27,7 @@ export async function announceOldAccounts() {
   process.env = { ...process.env, ...(await getParameters()) };
 
   // Fetch some accounts that haven't been announced for a while
-  const fediverseAccounts = await getAccountsSortedByLastAnnouncedDateTime(4);
+  const fediverseAccounts = await getAccountsSortedByLastAnnouncedDateTime(5);
 
   // Split them into batches and send out toots with them
   const batches: AccountEntity[][] = generateBatches(
