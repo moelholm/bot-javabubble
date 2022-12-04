@@ -20,26 +20,45 @@ export class IacJavabubbleStack extends cdk.Stack {
       billingMode: BillingMode.PAY_PER_REQUEST,
     });
 
-    const fn = new lambda.Function(this, "javabubblebotfunction", {
+    const gsiName = "LastAnnouncedDateTimeEpoch-index";
+    table.addGlobalSecondaryIndex({
+      indexName: gsiName,
+      partitionKey: {
+        name: "ItemSource",
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
+        name: "LastAnnouncedDateTimeEpoch",
+        type: dynamodb.AttributeType.NUMBER,
+      },
+      projectionType: dynamodb.ProjectionType.INCLUDE,
+      nonKeyAttributes: [
+        'FediverseHandle',
+        'LastAnnouncedDateTime',
+      ]
+    });
+
+    const announceNewAccountsLambdaFunction = new lambda.Function(this, "javabubblebotfunction", {
       runtime: lambda.Runtime.NODEJS_18_X,
-      handler: "build/lambda.handler",
+      handler: "build/lambda.announceNewAccounts",
       timeout: cdk.Duration.seconds(45),
       code: lambda.Code.fromAsset("../app-javabubble/lambda-function.zip"),
       environment: {
         SSM_PATH: '/APPLICATION/BOT-JAVABUBBLE',
         DDB_TABLE: table.tableName,
+        DDB_LAST_ANNOUNCED_INDEX: gsiName,
       },
     });
     
-    table.grantReadWriteData(fn);
-    fn.addToRolePolicy(new iam.PolicyStatement({
+    table.grantReadWriteData(announceNewAccountsLambdaFunction);
+    announceNewAccountsLambdaFunction.addToRolePolicy(new iam.PolicyStatement({
       actions: ['ssm:GetParametersByPath'],
       resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter/APPLICATION/BOT-JAVABUBBLE`],
     }));
 
     const rule = new events.Rule(this, 'javabubblebotrule', {
       schedule: events.Schedule.cron({minute: "0", hour: "*/2"}),
-      targets: [new targets.LambdaFunction(fn)],
+      targets: [new targets.LambdaFunction(announceNewAccountsLambdaFunction)],
     });
   }
 }
