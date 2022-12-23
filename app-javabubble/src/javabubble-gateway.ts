@@ -6,7 +6,7 @@ function accountInputHasSafeName(account: AccountInput): boolean {
 }
 
 function accountInputHasSafeFediverseHandle(account: AccountInput): boolean {
-  const fediverseHandleRegEx = /^@[\w\d']+@[\w\.]+$/u;
+  const fediverseHandleRegEx = /^@?[\w\d']+@[\w\.]+$/u;
   return !!(account.fediverse || "").match(fediverseHandleRegEx);
 }
 
@@ -23,7 +23,7 @@ function retainSafeInputFediverseAccounts(accounts: AccountInput[]) {
   const unsafeAccountsInput = accounts.filter(accountInputUnsafe);
   if (unsafeAccountsInput.length > 0) {
     console.error(
-      "Discarding one or more accounts input because it contains characters that are not allowlisted",
+      "Discarding one or more accounts because they don't meet the allowlisting rules",
       JSON.stringify(unsafeAccountsInput)
     );
   }
@@ -34,6 +34,14 @@ export type AccountInput = {
   fediverse: string;
   name: string;
 };
+
+function mapToAccountInputWithNormalizedFediverseAccountName(account: AccountInput): AccountInput {
+  const fediverse = account.fediverse.toLowerCase();
+  return {
+    ...account,
+    fediverse : fediverse.startsWith('@') ? fediverse : `@${fediverse}`,
+  };
+}
 
 export async function fetchAccounts(): Promise<AccountInput[]> {
   if (!process.env.FOLLOWING_FEED) {
@@ -50,7 +58,7 @@ export async function fetchAccounts(): Promise<AccountInput[]> {
 
   const fediverseAccountsSafeInput =
     retainSafeInputFediverseAccounts(fediverseAccounts)
-    .map(a => ({ ...a, fediverse: a.fediverse.toLowerCase() }));
+    .map(mapToAccountInputWithNormalizedFediverseAccountName);
 
   console.log(
     `Data fetched. allAccounts: [${allAccounts.length}]` +
