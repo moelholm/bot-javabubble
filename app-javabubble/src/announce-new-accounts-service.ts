@@ -1,8 +1,9 @@
-import { AccountInput } from "./javabubble-gateway";
+import { fetchAccounts } from "./javabubble-gateway";
 import { sendToot } from "./mastodon-gateway";
 import { AccountEntity, insertAccount } from "./account-repository";
-import { fetchNewFediverseAccounts, generateBatches } from "./account-service";
+import { generateBatches, retainNewFediverseAccounts } from "./account-service";
 import { getParameters } from "./ssm-gateway";
+import { AccountInput } from "./model";
 
 function createTootMessageText(newFediverseAccounts: AccountInput[]) {
   const accountsString = newFediverseAccounts
@@ -28,7 +29,11 @@ export async function announceNewAccounts() {
   process.env = { ...process.env, ...(await getParameters()) };
 
   // Fetch latest list of *new* fediverse people from javabubble.org
-  const newFediverseAccounts = await fetchNewFediverseAccounts();
+  const allAccounts = await fetchAccounts();
+  const newFediverseAccounts = await retainNewFediverseAccounts(allAccounts);
+  console.log(
+    `New accounts in the fediverse: [${newFediverseAccounts.length}]`
+  );
 
   if (newFediverseAccounts.length > 0) {
     console.log(`Posting update since new accounts was detected`);

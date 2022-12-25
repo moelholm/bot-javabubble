@@ -1,12 +1,12 @@
-import { fetchAccounts, AccountInput } from "./javabubble-gateway";
 import {
   AccountEntity,
   hasAccountWithFediverseHandle,
 } from "./account-repository";
+import { AccountInput } from "./model";
 
 const MAX_TOOT_LENGTH = 500;
 
-async function retainNewFediverseAccounts(accounts: AccountInput[]) {
+export async function retainNewFediverseAccounts(accounts: AccountInput[]) {
   const newFediverseAccounts: AccountInput[] = [];
   for (const account of accounts) {
     const exists = await hasAccountWithFediverseHandle(account.fediverse);
@@ -14,15 +14,6 @@ async function retainNewFediverseAccounts(accounts: AccountInput[]) {
       newFediverseAccounts.push(account);
     }
   }
-  return newFediverseAccounts;
-}
-
-export async function fetchNewFediverseAccounts() {
-  const allAccounts = await fetchAccounts();
-  const newFediverseAccounts = await retainNewFediverseAccounts(allAccounts);
-  console.log(
-    `New accounts in the fediverse: [${newFediverseAccounts.length}]`
-  );
   return newFediverseAccounts;
 }
 

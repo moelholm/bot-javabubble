@@ -1,4 +1,5 @@
 import axios from "axios";
+import { AccountInput } from "./model";
 
 function accountInputHasSafeName(account: AccountInput): boolean {
   const nameRegEx = /^[\p{Letter}\s\-\d\.\(\)']+$/u;
@@ -29,11 +30,6 @@ function retainSafeInputFediverseAccounts(accounts: AccountInput[]) {
   }
   return accounts.filter(accountInputSafe);
 }
-
-export type AccountInput = {
-  fediverse: string;
-  name: string;
-};
 
 function mapToAccountInputWithNormalizedFediverseAccountName(account: AccountInput): AccountInput {
   const fediverse = account.fediverse.toLowerCase();
