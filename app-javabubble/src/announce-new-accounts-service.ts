@@ -43,7 +43,7 @@ export async function announceNewAccounts() {
           createdDateTimeEpoch: now.getTime(),
           lastAnnouncedDateTime: now.toISOString(),
           lastAnnouncedDateTimeEpoch: now.getTime(),
-          itemSource: "javabubble.org",
+          itemSource: process.env.ITEM_SOURCE || '',
           timesAnnounced: 0,
         } as AccountEntity)
     );

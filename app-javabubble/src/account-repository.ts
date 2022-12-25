@@ -19,7 +19,7 @@ export type AccountEntity = {
   lastAnnouncedDateTimeEpoch: number;
   timesAnnounced: number;
 
-  itemSource: 'javabubble.org';
+  itemSource: string;
 };
 
 export async function insertAccount(account: AccountEntity) {
@@ -63,7 +63,7 @@ export async function updateAccountAnnouncementStatistics(fediverseHandle: strin
   );
 }
 
-export async function getAccountsSortedByLastAnnouncedDateTime(howMany: number, scanIndexForward = true) {
+export async function getAccountsSortedByLastAnnouncedDateTime(howMany: number, itemSource: string, scanIndexForward = true) {
   const fediverseHandles = await (
     await documentClient.send(
       new QueryCommand({
@@ -74,7 +74,7 @@ export async function getAccountsSortedByLastAnnouncedDateTime(howMany: number, 
           "#FediverseHandle": 'FediverseHandle',
         },        
         ExpressionAttributeValues: {
-          ":s": 'javabubble.org',
+          ":s": itemSource,
         },
         KeyConditionExpression: "ItemSource = :s",
         ScanIndexForward: scanIndexForward,
