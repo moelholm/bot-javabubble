@@ -6,6 +6,60 @@ import { AccountInput } from "./model";
 
 const MAX_TOOT_LENGTH = 500;
 
+function accountInputHasSafeName(account: AccountInput): boolean {
+  const nameRegEx = /^[\p{Letter}\s\-\d\.\(\)']+$/u;
+  return !!(account.name || "").match(nameRegEx);
+}
+
+function accountInputHasSafeFediverseHandle(account: AccountInput): boolean {
+  const fediverseHandleRegEx = /^@?[\w\d']+@[\w\.]+$/u;
+  return !!(account.fediverse || "").match(fediverseHandleRegEx);
+}
+
+function accountInputSafe(account: AccountInput): boolean {
+  return (
+    accountInputHasSafeName(account) && accountInputHasSafeFediverseHandle(account)
+  );
+}
+function accountInputUnsafe(account: AccountInput): boolean {
+  return !accountInputSafe(account);
+}
+
+function retainSafeInputFediverseAccounts(accounts: AccountInput[]) {
+  const unsafeAccountsInput = accounts.filter(accountInputUnsafe);
+  if (unsafeAccountsInput.length > 0) {
+    console.error(
+      "Discarding one or more accounts because they don't meet the allowlisting rules",
+      JSON.stringify(unsafeAccountsInput)
+    );
+  }
+  return accounts.filter(accountInputSafe);
+}
+
+function mapToAccountInputWithNormalizedFediverseAccountName(account: AccountInput): AccountInput {
+  const fediverse = account.fediverse.toLowerCase();
+  return {
+    ...account,
+    fediverse : fediverse.startsWith('@') ? fediverse : `@${fediverse}`,
+  };
+}
+
+export async function sanitizeAccounts(allAccounts: AccountInput[]): Promise<AccountInput[]> {
+  const fediverseAccounts = allAccounts.filter(({ fediverse }) => fediverse);
+
+  const fediverseAccountsSafeInput =
+    retainSafeInputFediverseAccounts(fediverseAccounts)
+    .map(mapToAccountInputWithNormalizedFediverseAccountName);
+
+  console.log(
+    `Data fetched. allAccounts: [${allAccounts.length}]` +
+      `, fediverseAccounts: [${fediverseAccounts.length}]` +
+      `, fediverseAccountsSafeInput: [${fediverseAccountsSafeInput.length}]`
+  );
+
+  return fediverseAccountsSafeInput;
+}
+
 export async function retainNewFediverseAccounts(accounts: AccountInput[]) {
   const newFediverseAccounts: AccountInput[] = [];
   for (const account of accounts) {
@@ -41,3 +95,4 @@ export function generateBatches(
   console.log(`Generated [${batches.length}] batches`);
   return batches;
 }
+
