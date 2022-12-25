@@ -27,7 +27,7 @@ export async function announceOldAccounts() {
   process.env = { ...process.env, ...(await getParameters()) };
 
   // Fetch some accounts that haven't been announced for a while
-  const fediverseAccounts = await getAccountsSortedByLastAnnouncedDateTime(5);
+  const fediverseAccounts = await getAccountsSortedByLastAnnouncedDateTime(5, process.env.ITEM_SOURCE || '');
 
   // Split them into batches and send out toots with them
   const batches: AccountEntity[][] = generateBatches(
