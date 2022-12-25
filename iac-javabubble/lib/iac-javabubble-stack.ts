@@ -39,7 +39,7 @@ export class IacJavabubbleStack extends cdk.Stack {
     //
     const announceNewAccountsLambdaFunction = this.createFunction(
       "javabubblebotfunction",
-      "build/lambda.announceNewAccounts",
+      "build/announce-new-accounts-service.announceNewAccounts",
       table,
       gsiName
     );
@@ -52,7 +52,7 @@ export class IacJavabubbleStack extends cdk.Stack {
     //
     const announceOldAccountsLambdaFunction = this.createFunction(
       "javabubblebotfunctionold",
-      "build/lambda.announceOldAccounts",
+      "build/announce-old-accounts-service.announceOldAccounts",
       table,
       gsiName
     );
