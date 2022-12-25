@@ -1,7 +1,7 @@
 import { fetchAccounts } from "./javabubble-gateway";
 import { sendToot } from "./mastodon-gateway";
 import { AccountEntity, insertAccount } from "./account-repository";
-import { generateBatches, retainNewFediverseAccounts } from "./account-service";
+import { generateBatches, retainNewFediverseAccounts, sanitizeAccounts } from "./account-service";
 import { getParameters } from "./ssm-gateway";
 import { AccountInput } from "./model";
 
@@ -28,9 +28,10 @@ export async function announceNewAccounts() {
   // Load configuration from SSM parameter store
   process.env = { ...process.env, ...(await getParameters()) };
 
-  // Fetch latest list of *new* fediverse people from javabubble.org
+  // Fetch latest list of *new* fediverse people
   const allAccounts = await fetchAccounts();
-  const newFediverseAccounts = await retainNewFediverseAccounts(allAccounts);
+  const allSanitizedAccounts = await sanitizeAccounts(allAccounts);
+  const newFediverseAccounts = await retainNewFediverseAccounts(allSanitizedAccounts);
   console.log(
     `New accounts in the fediverse: [${newFediverseAccounts.length}]`
   );
