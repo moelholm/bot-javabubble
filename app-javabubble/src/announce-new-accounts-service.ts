@@ -1,4 +1,4 @@
-import { sendToot } from "./mastodon-gateway";
+import { sendToot, getAccountDisplayName } from "./mastodon-gateway";
 import { AccountEntity, insertAccount } from "./account-repository";
 import {
   generateBatches,
@@ -6,7 +6,8 @@ import {
   sanitizeAccounts,
 } from "./account-service";
 import { getParameters } from "./ssm-gateway";
-import { getBubbleSourceConfiguration } from "./bubblesource-configuration-registry";
+import { getBubbleConfiguration } from "./bubble-configuration-registry";
+import { UNKOWN_USER_NAME } from "./model";
 
 export async function announceNewAccounts() {
   console.log("Bot woke up");
@@ -16,7 +17,7 @@ export async function announceNewAccounts() {
 
   // Load bubble source configuration
   const { fetchAccountsFunction, newAccountsMessageFunction } =
-    getBubbleSourceConfiguration();
+    getBubbleConfiguration();
 
   // Fetch latest list of *new* fediverse people
   const allAccounts = await fetchAccountsFunction();
@@ -58,6 +59,10 @@ export async function announceNewAccounts() {
       console.log(
         `Batch [${i + 1} of ${batches.length}], accounts [${batches[i].length}]`
       );
+      // Update account display names if needed (nasty side-effect to be cleaned up later)
+      for (const account of batches[i]) {
+        account.name = (account.name === UNKOWN_USER_NAME) ? await getAccountDisplayName(account.fediverse) : account.name;
+      }      
       // Store the new accounts
       for (const account of batches[i]) {
         await insertAccount(account);

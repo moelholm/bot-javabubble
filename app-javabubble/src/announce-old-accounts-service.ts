@@ -5,7 +5,7 @@ import {
 } from "./account-repository";
 import { getParameters } from "./ssm-gateway";
 import { generateBatches } from "./account-service";
-import { getBubbleSourceConfiguration } from "./bubblesource-configuration-registry";
+import { getBubbleConfiguration } from "./bubble-configuration-registry";
 
 export async function announceOldAccounts() {
   console.log("Bot woke up");
@@ -15,7 +15,7 @@ export async function announceOldAccounts() {
 
   // Load bubble source configuration
   const { oldAccountsMessageFunction, getAccountsFromDatabase } =
-    getBubbleSourceConfiguration();
+    getBubbleConfiguration();
 
   // Fetch some accounts that haven't been announced for a while
   const fediverseAccounts = await getAccountsFromDatabase();

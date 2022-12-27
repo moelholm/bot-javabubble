@@ -5,6 +5,22 @@ export type Toot = {
   status: string;
 };
 
+export async function getAccountDisplayName(fediverseAccountName: string) {
+  const [_, username, hostname] = fediverseAccountName.split("@");
+  try {
+    const htmlResponse = (await axios.get(`https://${hostname}/@${username}`)).data;
+    const htmlTitle = htmlResponse.match(/<title>(.*?) [\(\|].*?<\/title>/)[1];
+    const displayName = htmlTitle
+      .replace(/:.*:/, "") // remove markdown emojis
+      .replace(/[^\p{Letter}\s\-\d\.\(\)']/ug, "") // remove non-letters
+      .trim();
+    return displayName;
+  } catch (error) {
+    console.error(error);
+    return "jane/john doe";
+  }
+}
+
 export async function sendToot(toot: Toot) {
   if (process.env.MASTODON_SEND_MODE?.toLowerCase() !== "enabled") {
     console.log(
