@@ -1,26 +1,12 @@
-import { fetchAccounts } from "./javabubble-gateway";
 import { sendToot } from "./mastodon-gateway";
 import { AccountEntity, insertAccount } from "./account-repository";
-import { generateBatches, retainNewFediverseAccounts, sanitizeAccounts } from "./account-service";
+import {
+  generateBatches,
+  retainNewFediverseAccounts,
+  sanitizeAccounts,
+} from "./account-service";
 import { getParameters } from "./ssm-gateway";
-import { AccountInput } from "./model";
-
-function createTootMessageText(newFediverseAccounts: AccountInput[]) {
-  const accountsString = newFediverseAccounts
-    .map((a) => `\n👋🏼 ${a.name} - ${a.fediverse}`)
-    .join("");
-
-  return (
-    `Added to javabubble.org:` +
-    `\n${accountsString}` +
-    `\n\nFollow ${
-      newFediverseAccounts.length > 1 ? "these accounts" : "this account"
-    } if you are interested in #java and/or #jvm subjects.` +
-    ` More updates like this? Follow me or #JavaBubbleOrgNewAccountsAdded` +
-    `\n\nSource: #javabubble (javabubble.org)` +
-    `\nBotdev: ${process.env.MASTODON_BOT_OWNER}`
-  );
-}
+import { getBubbleSourceConfiguration } from "./bubblesource-configuration-registry";
 
 export async function announceNewAccounts() {
   console.log("Bot woke up");
@@ -28,10 +14,16 @@ export async function announceNewAccounts() {
   // Load configuration from SSM parameter store
   process.env = { ...process.env, ...(await getParameters()) };
 
+  // Load bubble source configuration
+  const { fetchAccountsFunction, newAccountsMessageFunction } =
+    getBubbleSourceConfiguration();
+
   // Fetch latest list of *new* fediverse people
-  const allAccounts = await fetchAccounts();
+  const allAccounts = await fetchAccountsFunction();
   const allSanitizedAccounts = await sanitizeAccounts(allAccounts);
-  const newFediverseAccounts = await retainNewFediverseAccounts(allSanitizedAccounts);
+  const newFediverseAccounts = await retainNewFediverseAccounts(
+    allSanitizedAccounts
+  );
   console.log(
     `New accounts in the fediverse: [${newFediverseAccounts.length}]`
   );
@@ -49,7 +41,7 @@ export async function announceNewAccounts() {
           createdDateTimeEpoch: now.getTime(),
           lastAnnouncedDateTime: now.toISOString(),
           lastAnnouncedDateTimeEpoch: now.getTime(),
-          itemSource: process.env.ITEM_SOURCE || '',
+          itemSource: process.env.ITEM_SOURCE || "",
           timesAnnounced: 0,
         } as AccountEntity)
     );
@@ -57,7 +49,7 @@ export async function announceNewAccounts() {
     // Announce new fediverse accounts in batches
     const batches: AccountEntity[][] = generateBatches(
       newFediverseAccountEntities,
-      createTootMessageText
+      newAccountsMessageFunction
     );
 
     console.log(`Processing [${batches.length}] batches`);
@@ -73,7 +65,7 @@ export async function announceNewAccounts() {
       // Send toot
       await sendToot({
         visibility: "public",
-        status: createTootMessageText(batches[i]),
+        status: newAccountsMessageFunction(batches[i]),
       });
     }
   }
