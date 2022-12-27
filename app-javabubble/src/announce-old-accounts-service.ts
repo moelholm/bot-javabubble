@@ -1,24 +1,11 @@
 import { sendToot } from "./mastodon-gateway";
 import {
   AccountEntity,
-  getAccountsSortedByLastAnnouncedDateTime,
   updateAccountAnnouncementStatistics,
 } from "./account-repository";
 import { getParameters } from "./ssm-gateway";
 import { generateBatches } from "./account-service";
-
-function createTootMessageText(fediverseAccounts: AccountEntity[]) {
-  const accountsString = fediverseAccounts
-    .map((a) => `\n👋🏼 ${a.name} - ${a.fediverse}`)
-    .join("");
-  return (
-    `Awesome #java / #jvm savvy accounts to follow:` +
-    `\n${accountsString}` +
-    `\n\nMore updates like this? Follow me or #JavaBubbleOrgAccountsRefresher` +
-    `\n\nSource: #javabubble (javabubble.org)` +
-    `\nBotdev: ${process.env.MASTODON_BOT_OWNER}`
-  );
-}
+import { getBubbleSourceConfiguration } from "./bubblesource-configuration-registry";
 
 export async function announceOldAccounts() {
   console.log("Bot woke up");
@@ -26,13 +13,17 @@ export async function announceOldAccounts() {
   // Load configuration from SSM parameter store
   process.env = { ...process.env, ...(await getParameters()) };
 
+  // Load bubble source configuration
+  const { oldAccountsMessageFunction, getAccountsFromDatabase } =
+    getBubbleSourceConfiguration();
+
   // Fetch some accounts that haven't been announced for a while
-  const fediverseAccounts = await getAccountsSortedByLastAnnouncedDateTime(5, process.env.ITEM_SOURCE || '');
+  const fediverseAccounts = await getAccountsFromDatabase();
 
   // Split them into batches and send out toots with them
   const batches: AccountEntity[][] = generateBatches(
     fediverseAccounts,
-    createTootMessageText
+    oldAccountsMessageFunction
   );
 
   console.log(`Processing [${batches.length}] batches`);
@@ -48,7 +39,7 @@ export async function announceOldAccounts() {
     // Send the toot
     await sendToot({
       visibility: "public",
-      status: createTootMessageText(batches[i]),
+      status: oldAccountsMessageFunction(batches[i]),
     });
   }
 

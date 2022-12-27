@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AccountInput } from "./model";
+import { AccountInput } from "../model";
 
 export async function fetchAccounts(): Promise<AccountInput[]> {
   if (!process.env.FOLLOWING_FEED) {
