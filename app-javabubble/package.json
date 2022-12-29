@@ -8,7 +8,7 @@
     "compile": "npx tsc",
     "start:dev:announce-new-accounts": "nodemon announce-new-accounts",
     "start:dev:announce-old-accounts": "nodemon announce-old-accounts",
-    "start:dev:read-notifications-from-owner": "nodemon read-notifications-from-owner",
+    "start:dev:handle-notifications-from-owner": "nodemon handle-notifications-from-owner",
     "build": "rimraf ./build && tsc",
     "zip": "zip -r lambda-function.zip build node_modules",
     "build:lambda": "npm install && npm run build && rimraf ./node_modules && npm i --production && npm run zip && npm install",

@@ -17,7 +17,7 @@ async function handleNotification(notification: string) {
   return `Available commands: [echo]`;
 }
 
-export async function readNotificationsFromOwner() {
+export async function handleNotificationsFromOwner() {
   console.log("Bot woke up");
 
   // Load configuration from SSM parameter store
