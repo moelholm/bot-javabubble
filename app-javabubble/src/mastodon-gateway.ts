@@ -37,8 +37,10 @@ export async function getAccountDisplayName(fediverseAccountName: string) {
       .data;
     const htmlTitle = htmlResponse.match(/<title>(.*?) [\(\|].*?<\/title>/)[1];
     const displayName = htmlTitle
-      .replace(/:.*:/, "") // remove markdown emojis
-      .replace(/[^\p{Letter}\s\-\d\.\(\)']/gu, "") // remove non-letters
+      .replace(/\&quot\;/g, "\"") // preserve quotes (people seem to fancy that)
+      .replace(/\&.*?\;/, "") // remove all other html entities
+      .replace(/:.*:/, "") // remove markdown emojis (greedy is intentional)
+      .replace(/[^\p{Letter}\s\-\d\.\(\)'"]/gu, "") // remove non-letters
       .trim();
     return displayName;
   } catch (error) {
