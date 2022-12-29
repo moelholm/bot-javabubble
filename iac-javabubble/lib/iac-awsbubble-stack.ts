@@ -69,10 +69,6 @@ export class IacAwsbubbleStack extends cdk.Stack {
       table,
       gsiName
     );
-    const handleNotificationsRule = new events.Rule(this, "awsbubblebotrulehandlenotifications", {
-      schedule: events.Schedule.cron({ minute: "*/10" }),
-      targets: [new targets.LambdaFunction(handleNotificationsFromOwnerLambdaFunction)],
-    });
   }
 
   createFunction(
