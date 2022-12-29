@@ -12,7 +12,7 @@ function accountInputHasSafeName(account: AccountInput): boolean {
 }
 
 function accountInputHasSafeFediverseHandle(account: AccountInput): boolean {
-  const fediverseHandleRegEx = /^@?[\w\d']+@[\w\.]+$/u;
+  const fediverseHandleRegEx = /^@?[\w\d']+@[\w\.-]+$/u;
   return !!(account.fediverse || "").match(fediverseHandleRegEx);
 }
 
