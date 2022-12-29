@@ -69,10 +69,6 @@ export class IacJavabubbleStack extends cdk.Stack {
       table,
       gsiName
     );
-    const handleNotificationsRule = new events.Rule(this, "javabubblebotrulehandlenotifications", {
-      schedule: events.Schedule.cron({ minute: "*/10" }),
-      targets: [new targets.LambdaFunction(handleNotificationsFromOwnerLambdaFunction)],
-    });
   }
 
   createFunction(
