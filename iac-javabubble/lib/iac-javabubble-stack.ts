@@ -60,6 +60,19 @@ export class IacJavabubbleStack extends cdk.Stack {
       schedule: events.Schedule.cron({ hour: "12", minute: "12" }),
       targets: [new targets.LambdaFunction(announceOldAccountsLambdaFunction)],
     });
+    //
+    // Function: Owner notification handler
+    //
+    const handleNotificationsFromOwnerLambdaFunction = this.createFunction(
+      "javabubblebotfunctionhandlenotifications",
+      "build/handle-notifications-from-owner-service.handleNotificationsFromOwner",
+      table,
+      gsiName
+    );
+    const handleNotificationsRule = new events.Rule(this, "javabubblebotrulehandlenotifications", {
+      schedule: events.Schedule.cron({ minute: "*/10" }),
+      targets: [new targets.LambdaFunction(handleNotificationsFromOwnerLambdaFunction)],
+    });
   }
 
   createFunction(
